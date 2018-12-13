@@ -2,8 +2,8 @@
   <div class="container">
     <div class="row center yellow" style="{padding-bottom: '40px'}">
       <div class="jumbotron" id="block1">
-      <h1 style="{font-size: '63px'}">SWAPI</h1>
-      <p class="lead" style="{font-size: '39px'}">The Star Wars API</p>
+        <h1 style="{font-size: '63px'}">SWAPI</h1>
+        <p class="lead" style="{font-size: '39px'}">The Star Wars API</p>
       </div>
     </div>
     <div class="row" id="block2">
@@ -105,6 +105,7 @@ h1, h2 {
   padding-bottom: 50px;
 }
 #block1 {
+  width: 100%;
   color: #ffe300;
   background: #1C1E22;
   margin-top: 60px;
