@@ -20,7 +20,7 @@
     </div>
 
     <div id="content">
-      <h1 id="t1" >Try it now!</h1>
+      <a href="#/view"><h1 id="t1" >Click Here to Try GraphQL Service!</h1></a>
 
       <div class="input-group" id="url-input">
         <span class="input-group-addon" id="input-label">https://swapi.co/api/</span>
@@ -45,14 +45,13 @@
       </div>
       <div class="col-sm-4 col-lg-4 col-md-4">
         <h4 class="center">How can I use it?</h4>
-        <p>All the data is accessible through our HTTP web API. Consult our <a href="/documentation">documentation</a> if you'd like to get started.</p>
+        <p>All the data is accessible through our HTTP web API. Consult our <a href="https://swapi.co/documentation">documentation</a> if you'd like to get started.</p>
         <p>Helper libraries for popular programming languages are also provided so you can consume swapi in your favourite programming language, in a style that suits you.</p>
       </div>
       <div class="col-sm-3 col-lg-3 col-md-3">
         <h4 class="center">How can I support this?</h4>
         <p>With small donations we can keep swapi running for free, please consider throwing us some beer money to say thank you. With every $10 we can keep the site up for another month!</p>
-        <p></p><form action="/stripe/donation" method="POST">
-        </form><p></p>
+        <p></p><p></p>
         <p>This project is open source and you can contribute <a href="https://github.com/phalt/swapi">on GitHub</a>.</p>
       </div>
       <div class="col-sm-1 col-lg-1 col-md-1">

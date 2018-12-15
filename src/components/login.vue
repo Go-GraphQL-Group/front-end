@@ -1,17 +1,18 @@
 <template>
-<div id="login-modal">
-  <div class="loginmodal-container">
-    <h1>Login to Your Account</h1><br>
-     <form>
-      <input type="text" name="user" placeholder="Username" v-model="username">
-      <input type="password" name="pass" placeholder="Password" v-model="pass">
-      <input type="submit" name="login" class="login loginmodal-submit" value="Login">
-     </form>
-     <div class="login-help">
-      <a href="#">Register</a> - <a href="#">Forgot Password</a>
-     </div>
-  </div>
-</div>
+<mu-container id="wrapper">
+  <mu-form ref="form" :model="validateForm" class="mu-demo-form">
+    <mu-form-item label="用户名" help-text="帮助文字" prop="username" :rules="usernameRules" class="nice-border">
+      <mu-text-field v-model="validateForm.username" prop="username"></mu-text-field>
+    </mu-form-item>
+    <mu-form-item label="密码" prop="password" :rules="passwordRules" class="nice-border">
+        <mu-text-field type="password" v-model="validateForm.password" prop="password"></mu-text-field>
+    </mu-form-item>
+    <mu-form-item class="center">
+      <mu-button color="primary" @click="login" style="display: flex;align-self: center;margin: auto auto;">提交</mu-button>
+      <mu-button @click="clear" style="display: flex;align-self: center;margin: auto auto;">重置</mu-button>
+    </mu-form-item>
+  </mu-form>
+</mu-container>
 </template>
 
 <script>
@@ -21,107 +22,81 @@ export default {
     return {
       showLogin: true,
       username: '',
-      pass: ''
+      password: '',
+      usernameRules: [
+        {validate: (val) => !!val, message: '必须填写用户名'},
+        {validate: (val) => val.length >= 3, message: '用户名长度大于3'}
+      ],
+      passwordRules: [
+        {validate: (val) => !!val, message: '必须填写密码'},
+        {validate: (val) => val.length >= 3 && val.length <= 10, message: '密码长度大于3小于10'}
+      ],
+      validateForm: {
+        username: '',
+        password: ''
+      }
     }
   },
   methods: {
+    async login () {
+      console.log(this.validateForm.username)
+      console.log(this.validateForm.password)
+      let res = await this.$http({
+        url: 'http://localhost:9090/login',
+        method: 'post',
+        data: this.$qs.stringify({
+          username: this.validateForm.username,
+          password: this.validateForm.password
+        }),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+      console.log(res)
+      // this.$alert(res)
+      // todo: judge the status
+      this.$store.state.main.login = true
+      this.$store.state.main.token = res.data['SW-TOKEN']
+      this.$router.push('/view')
+    },
+    submit () {
+      this.$refs.form.validate().then((result) => {
+        console.log('form valid: ', result)
+      })
+    },
+    clear () {
+      this.$refs.form.clear()
+      this.validateForm = {
+        username: '',
+        password: ''
+      }
+    }
   }
 }
 </script>
 
 <style scoped>
-#login-modal {
-  background-color: #272B30;
-  height: 100%;
-  padding-top: 60px;
-}
-.loginmodal-container {
-  padding: 30px;
-  max-width: 350px;
-  width: 100% !important;
-  background-color: #F7F7F7;
-  margin: 0px auto;
-  border-radius: 2px;
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  font-family: roboto;
-}
-
-.loginmodal-container h1 {
-  text-align: center;
-  font-size: 1.8em;
-  font-family: roboto;
-}
-
-.loginmodal-container input[type=submit] {
-  width: 100%;
-  display: block;
-  margin-bottom: 10px;
-  position: relative;
-}
-
-.loginmodal-container input[type=text], input[type=password] {
-  height: 44px;
-  font-size: 16px;
-  width: 100%;
-  margin-bottom: 10px;
-  -webkit-appearance: none;
-  background: #fff;
-  border: 1px solid #d9d9d9;
-  border-top: 1px solid #c0c0c0;
-  /* border-radius: 2px; */
-  padding: 0 8px;
+#wrapper {
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
+  width: 400px;
+  margin: 60px auto;
+  background-color: #f7f7f7;
+  padding: 30px 40px;
+  padding-bottom: 10px;
+  border: 2px solid #f1f1f1;
+  border-radius: 4px;
 }
-
-.loginmodal-container input[type=text]:hover, input[type=password]:hover {
-  border: 1px solid #b9b9b9;
-  border-top: 1px solid #a0a0a0;
-  -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+.nice-border {
+  border: 0px solid #747474;
 }
-
-.loginmodal {
-  text-align: center;
-  font-size: 14px;
-  font-family: 'Arial', sans-serif;
-  font-weight: 700;
-  height: 36px;
-  padding: 0 8px;
-/* border-radius: 3px; */
-/* -webkit-user-select: none;
-  user-select: none; */
+.center {
+  display: flex;
+  justify-content: center;
+  align-content: flex-end;
+  margin-top: 30px;
 }
-
-.loginmodal-submit {
-  /* border: 1px solid #3079ed; */
-  border: 0px;
-  color: #fff;
-  text-shadow: 0 1px rgba(0,0,0,0.1);
-  background-color: #4d90fe;
-  padding: 17px 0px;
-  font-family: roboto;
-  font-size: 14px;
-  /* background-image: -webkit-gradient(linear, 0 0, 0 100%,   from(#4d90fe), to(#4787ed)); */
-}
-
-.loginmodal-submit:hover {
-  /* border: 1px solid #2f5bb7; */
-  border: 0px;
-  text-shadow: 0 1px rgba(0,0,0,0.3);
-  background-color: #357ae8;
-  /* background-image: -webkit-gradient(linear, 0 0, 0 100%,   from(#4d90fe), to(#357ae8)); */
-}
-
-.loginmodal-container a {
-  text-decoration: none;
-  color: #666;
-  font-weight: 400;
-  text-align: center;
-  display: inline-block;
-  opacity: 0.6;
-  transition: opacity ease 0.5s;
+.mu-demo-form {
+  width: 100%;
+  max-width: 460px;
 }
 </style>

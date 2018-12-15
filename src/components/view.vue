@@ -1,7 +1,7 @@
 <template>
 <div id="wrapper">
   <div id="filters">
-    <h2>Filters:</h2>
+    <h2>Filters: Specify whatever you need! </h2>
     <mu-container>
       <mu-form :model="form" class="filter-form">
         <mu-container class="filter">
@@ -22,10 +22,10 @@
           <mu-form-item prop="input" v-if="form[filter].queryType === 'lookup'" label="id" label-position="left" style="max-width: 200px;margin-bottom: 10px;">
             <mu-text-field v-model="form[filter].id"></mu-text-field>
           </mu-form-item>
-          <mu-form-item prop="input" v-if="form[filter].queryType === 'browse'" label="first" label-position="left" style="max-width: 200px;margin-bottom: 10px;">
+          <mu-form-item prop="input" v-if="form[filter].queryType !== 'lookup'" label="first" label-position="left" style="max-width: 200px;margin-bottom: 10px;">
             <mu-text-field v-model="form[filter].first"></mu-text-field>
           </mu-form-item>
-          <mu-form-item prop="input" v-if="form[filter].queryType === 'browse'" label="after" label-position="left" style="max-width: 200px;margin-bottom: 10px;">
+          <mu-form-item prop="input" v-if="form[filter].queryType !== 'lookup'" label="after" label-position="left" style="max-width: 200px;margin-bottom: 10px;">
             <mu-text-field v-model="form[filter].after"></mu-text-field>
           </mu-form-item>
           <mu-form-item prop="input" v-if="form[filter].queryType === 'search'" label="search" label-position="left" style="max-width: 200px;margin-bottom: 10px;">
@@ -171,23 +171,52 @@ export default {
       }
     },
     async requestData () {
+      // check login state
+      if (this.$store.state.main.login !== true) {
+        this.$alert('You should login before you can request the GraphQL Service', 'alert')
+        return
+      }
       // todo add token
-      console.log('request data')
       this.query = this.generateQuery()
-      this.queryStr = '{\n' + this.queryToStr(this.query, 1) + '\n}\n'
+      console.log(this.query)
+      this.queryStr = this.queryToStr(this.query, 0) + '\n'
       // make req
-      let req = {}
-      req.query = this.queryStr
-      req.operationName = null
-      req.variables = {}
-      let res = await this.$http.post('http://localhost:9090/query', req)
-      console.log(req)
+      let res = await this.$http({
+        url: 'http://localhost:9090/query',
+        method: 'post',
+        data: {
+          operationName: null,
+          query: this.queryStr,
+          variables: {}
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'SW-TOKEN': this.$store.state.main.token
+        }
+      })
       console.log(res)
       this.result = res.data
     },
     generateQuery () {
       // return this.genLookupQuery(this.form.people)
-      return this.genSearchQuery(this.form.people)
+      let query = {count: this.form.param.values.length, nodeName: '', hasParam: false}
+      for (let i = 0; i < this.form.param.values.length; i++) {
+        let type = this.form.param.values[i]
+        switch (this.form[type].queryType) {
+          case 'lookup':
+            query[String(i)] = this.genLookupQuery(this.form[type])
+            break
+          case 'browse':
+            query[String(i)] = this.genBrowseQuery(this.form[type])
+            break
+          case 'search':
+            query[String(i)] = this.genSearchQuery(this.form[type])
+            break
+          default:
+            console.log('invalid query type')
+        }
+      }
+      return query
     },
     genLookupQuery (filter) {
       let query = {}

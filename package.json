@@ -16,6 +16,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "muse-ui": "^3.0.1",
+    "muse-ui-message": "^0.2.1",
+    "qs": "^6.6.0",
     "sass-loader": "^7.1.0",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
