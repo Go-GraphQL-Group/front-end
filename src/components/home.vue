@@ -20,7 +20,7 @@
     </div>
 
     <div id="content">
-      <a href="/view"><h1 id="t1" >Click Here to Try GraphQL Service!</h1></a>
+      <a href="#/view"><h1 id="t1" >Click Here to Try GraphQL Service!</h1></a>
 
       <div class="input-group" id="url-input">
         <span class="input-group-addon" id="input-label">https://swapi.co/api/</span>
