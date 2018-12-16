@@ -20,7 +20,7 @@
     </div>
 
     <div id="content">
-      <a href="#/view"><h1 id="t1" >Click Here to Try GraphQL Service!</h1></a>
+      <a href="/view"><h1 id="t1" >Click Here to Try GraphQL Service!</h1></a>
 
       <div class="input-group" id="url-input">
         <span class="input-group-addon" id="input-label">https://swapi.co/api/</span>
@@ -28,7 +28,7 @@
         <span class="input-group-btn"><button @click="getAPIResult" class="btn btn-primary" style="background-color: #464B4F;border: 1px solid #404550;border-radius: 4px;">request</button></span>
       </div>
 
-      <p style="width:70%;text-align:left;margin: 0 auto;"><small>Need a hint? try <a href="#" onclick=""><i>people/1/</i></a> or <a href="#" onclick=""><i>planets/3/</i></a> or <a href="#" onclick=""><i>starships/9/</i></a></small>
+      <p style="width:70%;text-align:left;margin: 0 auto;"><small>Need a hint? try <a @click="getHintResult('people/1')"><i>people/1/</i></a> or <a @click="getHintResult('planets/3')"><i>planets/3/</i></a> or <a @click="getHintResult('starships/9')"><i>starships/9/</i></a></small>
       </p>
 
       <p class="lead pad_top" style="font-size:22px;width:70%;text-align:left;margin: 0 auto;padding-top: 15px;">Result:</p>
@@ -83,6 +83,10 @@ export default {
       let res = await this.$http.get(api)
       this.result = res.data
       console.log(res)
+    },
+    async getHintResult (url) {
+      this.url = url
+      this.getAPIResult()
     }
   }
 }

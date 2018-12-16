@@ -11,8 +11,18 @@
             <mu-checkbox v-for="item in form.param.group" v-model="form.param.values" :key="item" :value="item" :label="item"></mu-checkbox>
           </mu-form-item>
         </mu-container>
-        <!-- people filter -->
-        <mu-container class="filter" v-for="filter in form.param.group" :key="filter">
+        <mu-container class="filter">
+          <mu-form-item prop="radio" label="filter type:" label-position="left" style="margin-bottom: 10px;">
+            <mu-radio v-model="filterType" label="people" value="people"></mu-radio>
+            <mu-radio v-model="filterType" label="planets" value="planets"></mu-radio>
+            <mu-radio v-model="filterType" label="films" value="films"></mu-radio>
+            <mu-radio v-model="filterType" label="species type" value="species"></mu-radio>
+            <mu-radio v-model="filterType" label="vehicles" value="vehicles"></mu-radio>
+            <mu-radio v-model="filterType" label="starships" value="starships"></mu-radio>
+          </mu-form-item>
+        </mu-container>
+        <!-- filter filter -->
+        <mu-container class="filter" v-for="filter in form.param.group" :key="filter" v-if="filter === filterType">
           <label style="display: block;margin-right: 20px;">{{form[filter].label}}:</label>
           <mu-form-item prop="radio" label="query type:" label-position="left" style="margin-bottom: 10px;">
             <mu-radio v-model="form[filter].queryType" label="lookup" value="lookup"></mu-radio>
@@ -28,13 +38,13 @@
           <mu-form-item prop="input" v-if="form[filter].queryType !== 'lookup'" label="after" label-position="left" style="max-width: 200px;margin-bottom: 10px;">
             <mu-text-field v-model="form[filter].after"></mu-text-field>
           </mu-form-item>
-          <mu-form-item prop="input" v-if="form[filter].queryType === 'search'" label="search" label-position="left" style="max-width: 200px;margin-bottom: 10px;">
-            <mu-text-field v-model="form[filter].search"></mu-text-field>
+          <mu-form-item prop="input" v-if="form[filter].queryType === 'search'" label="search" label-position="left" style="max-width: 250px;margin-bottom: 10px;">
+            <mu-text-field v-model="form[filter].search" placeholder="Name:Luke Skywalker"></mu-text-field>
           </mu-form-item>
           <mu-form-item prop="checkbox">
             <label style="margin-right: 20px;">fields:</label>
-            <mu-checkbox v-model="isAllFieldsSet" label="all"></mu-checkbox>
-            <mu-checkbox v-for="item in form[filter].group" v-model="form[filter].values" :key="item" :value="item" :label="item"></mu-checkbox>
+            <mu-checkbox v-model="setStates[filter]" label="all" style="padding: 20px;" @change="setStateChanged($event, filter)"></mu-checkbox>
+            <mu-checkbox v-for="item in form[filter].group" v-model="form[filter].values" :key="item" :value="item" :label="item" style="padding: 20px;" @change="handleItemChanged($event, filter)"></mu-checkbox>
           </mu-form-item>
         </mu-container>
         <!-- planets filter -->
@@ -62,6 +72,8 @@ export default {
       query: {},
       queryStr: '',
       result: '',
+      filterType: 'people',
+      setStates: {'people': false, 'planets': false, 'films': false, 'species': false, 'vehicles': false, 'starships': false},
       form: {
         param: {
           paramName: 'type',
@@ -155,9 +167,15 @@ export default {
     },
     isAllFieldsSet: {
       get: function () {
-        return this.form.people.values.length === this.form.people.group.length
+        // return this.form.people.values.length === this.form.people.group.length
+        let r = this.form.param.group.map(item => {
+          return this.form[item].values.length === this.form[item].group.length
+        })
+        console.log('is all set:', r)
+        return r
       },
       set: function (newvalue) {
+        console.log('newvalue:', newvalue)
         this.handleChangeAll(this.form.people, newvalue)
       }
     }
@@ -170,10 +188,28 @@ export default {
         param.values = []
       }
     },
+    setStateChanged (e, filter) {
+      // console.log('changed:', filter)
+      // console.log('newvalue:', e)
+      if (e) {
+        this.form[filter].values = this.form[filter].group.slice(0)
+      } else {
+        this.form[filter].values = []
+      }
+    },
+    handleItemChanged (e, filter) {
+      // console.log('item changed:', filter)
+      // console.log('newvalue:', e)
+      this.setStates[filter] = this.form[filter].values.length === this.form[filter].group.length
+    },
     async requestData () {
       // check login state
       if (this.$store.state.main.login !== true) {
         this.$alert('You should login before you can request the GraphQL Service', 'alert')
+        return
+      }
+      if (this.form.param.values.length === 0) {
+        this.$alert('No specified resource types, please specify at least one resource type', 'alert')
         return
       }
       // todo add token
@@ -181,8 +217,8 @@ export default {
       console.log(this.query)
       this.queryStr = this.queryToStr(this.query, 0) + '\n'
       // make req
-      let res = await this.$http({
-        url: 'http://localhost:9090/query',
+      await this.$http({
+        url: '/api/query',
         method: 'post',
         data: {
           operationName: null,
@@ -191,15 +227,20 @@ export default {
         },
         headers: {
           'Content-Type': 'application/json',
-          'SW-TOKEN': this.$store.state.main.token
+          'SW_TOKEN': this.$store.state.main.token
         }
+      }).then(res => {
+        console.log(res)
+        this.result = res.data
+      }).catch(err => {
+        console.log('request data failed')
+        console.log(err)
+        this.result = err.response.data.errors
       })
-      console.log(res)
-      this.result = res.data
     },
     generateQuery () {
       // return this.genLookupQuery(this.form.people)
-      let query = {count: this.form.param.values.length, nodeName: '', hasParam: false}
+      let query = {count: this.form.param.values.length, nodeName: 'query', hasParam: false}
       for (let i = 0; i < this.form.param.values.length; i++) {
         let type = this.form.param.values[i]
         switch (this.form[type].queryType) {
@@ -227,6 +268,9 @@ export default {
       query.param.names = ['id']
 
       // put fields
+      if (filter.values.length === 0) {
+        filter.values.push('id')
+      }
       query.count = filter.values.length
       for (let i = 0; i < query.count; i++) {
         query[String(i)] = {}
@@ -259,7 +303,7 @@ export default {
       // browse query structure
       query.nodeName = filter.paramName + 's'
       query.hasParam = true
-      query.param = {'first': filter.first}
+      query.param = {'first': Number(filter.first)}
       query.param.names = ['first']
       if (filter.after !== '') {
         query.param.after = filter.after
@@ -278,7 +322,7 @@ export default {
       // browse query structure
       query.nodeName = filter.paramName + 'Search'
       query.hasParam = true
-      query.param = {'search': filter.search, 'first': filter.first}
+      query.param = {'search': filter.search, 'first': Number(filter.first)}
       query.param.names = ['search', 'first']
       if (filter.after !== '') {
         query.param.after = filter.after
@@ -296,6 +340,9 @@ export default {
       let node = {}
       node.nodeName = nodeName
       node.hasParam = false
+      if (filter.values.length === 0) {
+        filter.values.push('id')
+      }
       node.count = filter.values.length
       for (let i = 0; i < node.count; i++) {
         node[String(i)] = {}
@@ -347,7 +394,12 @@ export default {
       if (query.hasParam) {
         param = this.paramToStr(query.param)
       }
-      let str = '' + indents + query.nodeName + param + ' {\n'
+      let str = '' + indents + query.nodeName + param
+      if (query.nodeName === '') {
+        str += '{\n'
+      } else {
+        str += ' {\n'
+      }
       for (let i = 0; i < count; i++) {
         // add sub item
         if (query[String(i)].count === 0) {
@@ -372,7 +424,11 @@ export default {
       for (let id in param.names) {
         let name = param.names[id]
         if (typeof (param[name]) === 'number') {
-          items.push(name + ': ' + param[name])
+          if (isNaN(param[name])) {
+            items.push(name + ': ' + '1')
+          } else {
+            items.push(name + ': ' + param[name])
+          }
         } else {
           items.push(name + ': ' + '"' + param[name] + '"')
         }

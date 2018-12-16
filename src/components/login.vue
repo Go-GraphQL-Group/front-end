@@ -39,10 +39,8 @@ export default {
   },
   methods: {
     async login () {
-      console.log(this.validateForm.username)
-      console.log(this.validateForm.password)
       let res = await this.$http({
-        url: 'http://localhost:9090/login',
+        url: '/api/login',
         method: 'post',
         data: this.$qs.stringify({
           username: this.validateForm.username,
@@ -52,11 +50,14 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       })
-      console.log(res)
-      // this.$alert(res)
+      console.log('response:', res)
       // todo: judge the status
-      this.$store.state.main.login = true
-      this.$store.state.main.token = res.data['SW-TOKEN']
+      this.$store.commit('login', {
+        status: true,
+        token: res.data[this.$store.state.main.tokenName]
+      })
+      console.log('login state: ', this.$store.state.main.login)
+      console.log('get token ', this.$store.state.main.token)
       this.$router.push('/view')
     },
     submit () {

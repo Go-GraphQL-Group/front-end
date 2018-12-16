@@ -1,7 +1,7 @@
 <template>
   <mu-appbar id="bar" text-color="#FFE300" color="#1C1E22">
-    <a href="#/"><span id="#title" >SWAPI</span></a>
-    <a slot="right" href="#/login" v-if="login === false" style="background-color: #1C1E22;color: #FFFFFF;font-size: 18px;padding: 8px 8px;margin-right: 30px;">LOGIN</a>
+    <a href="/"><span id="#title" >SWAPI</span></a>
+    <a slot="right" href="/login" v-if="login === false" style="background-color: #1C1E22;color: #FFFFFF;font-size: 18px;padding: 8px 8px;margin-right: 30px;">LOGIN</a>
     <mu-button slot="right" @click="logout" v-if="login === true" style="background-color: #1C1E22;color: #FFFFFF;font-size: 15px;margin-right: 30px;">Logout</mu-button>
   </mu-appbar>
 </template>
@@ -17,18 +17,20 @@ export default {
   },
   methods: {
     async logout () {
-      console.log('ready to logout')
-      this.$store.state.main.login = false
       let res = await this.$http({
-        url: 'http://localhost:9090/logout',
+        url: '/api/logout',
         method: 'GET',
         headers: {
-          'SW-TOKEN': this.$store.state.main.token
+          'SW_TOKEN': this.$store.state.main.token
         }
       })
       this.$alert('logout finished!', 'alert')
-      console.log(res)
-      this.$store.state.main.login = false
+      console.log('response:', res)
+      this.$store.commit('login', {
+        status: false
+      })
+      console.log('cur token:', this.$store.state.main.token)
+      console.log('cur login:', this.$store.state.main.login)
     }
   }
 }

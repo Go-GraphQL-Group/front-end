@@ -1,7 +1,7 @@
 const state = {
   token: '',
   login: false,
-  tokenName: 'SW-TOKEN'
+  tokenName: 'sw_token'
 }
 
 const getters = {}
@@ -9,19 +9,13 @@ const getters = {}
 const actions = {}
 
 const mutations = {
-  info (state, msg) {
-    state.popUp = true
-    state.popMsg = msg
-    setTimeout(() => {
-      state.popUp = false
-      state.popMsg = ''
-    }, 2000)
-  },
-  login (val) {
-    if (val) {
+  login (state, val) {
+    if (val.status) {
       state.login = true
+      state.token = val.token
     } else {
       state.login = false
+      state.token = ''
     }
   }
 }
