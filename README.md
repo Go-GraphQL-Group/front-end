@@ -1,7 +1,6 @@
 # front-end
-
+[![Build Status](https://travis-ci.com/Go-GraphQL-Group/front-end.svg?branch=master)](https://travis-ci.com/Go-GraphQL-Group/front-end?branch=master)
 > A SPA for browsing swapi(star wars api)!
-
 ## Build Setup
 
 ``` bash
@@ -30,4 +29,10 @@ npm test
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 ## Deployed Service
-http://149.28.147.63:9090
+http://149.28.147.63:9090  
+
+### username: 
+admin
+
+### password: 
+password 
