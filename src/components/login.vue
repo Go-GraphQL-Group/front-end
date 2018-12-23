@@ -1,7 +1,7 @@
 <template>
 <mu-container id="wrapper">
   <mu-form ref="form" :model="validateForm" class="mu-demo-form">
-    <mu-form-item label="用户名" help-text="帮助文字" prop="username" :rules="usernameRules" class="nice-border">
+    <mu-form-item label="用户名" help-text="默认帐号" prop="username" :rules="usernameRules" class="nice-border">
       <mu-text-field v-model="validateForm.username" prop="username"></mu-text-field>
     </mu-form-item>
     <mu-form-item label="密码" prop="password" :rules="passwordRules" class="nice-border">
@@ -21,8 +21,8 @@ export default {
   data () {
     return {
       showLogin: true,
-      username: '',
-      password: '',
+      username: 'admin',
+      password: 'password',
       usernameRules: [
         {validate: (val) => !!val, message: '必须填写用户名'},
         {validate: (val) => val.length >= 3, message: '用户名长度大于3'}
