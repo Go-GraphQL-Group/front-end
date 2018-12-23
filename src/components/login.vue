@@ -32,8 +32,8 @@ export default {
         {validate: (val) => val.length >= 3 && val.length <= 10, message: '密码长度大于3小于10'}
       ],
       validateForm: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: 'password'
       }
     }
   },
