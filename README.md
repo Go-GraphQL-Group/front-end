@@ -29,6 +29,8 @@ npm test
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 ## Deployed Service
-http://149.28.147.63:9090 
-username:admin 
+http://149.28.147.63:9090  
+
+username:admin
+
 password:password 
