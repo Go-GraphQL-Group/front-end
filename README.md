@@ -1,7 +1,6 @@
 # front-end
-
 > A SPA for browsing swapi(star wars api)!
-
+[![Build Status](https://travis-ci.org/Go-GraphQL-Group/front-end/builds/471362530)
 ## Build Setup
 
 ``` bash
