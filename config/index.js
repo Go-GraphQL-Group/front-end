@@ -3,7 +3,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-
+const SERVER_ADDR = process.env.SERVER_ADDR
 module.exports = {
   dev: {
 
@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api/': {
-        target: 'http://localhost:9090',
+        target: SERVER_ADDR || 'http://localhost:9090',
         changeOrigin: true
       }
     },
